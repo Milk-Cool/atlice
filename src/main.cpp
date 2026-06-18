@@ -5,6 +5,8 @@
 
 #define PIN_FUN 3
 
+ISR(WDT_vect) {}
+
 #if MOOD_INDICATOR
 typedef struct {
     uint8_t r;
@@ -29,8 +31,6 @@ uint8_t color;
 #define PIN_R 0
 #define PIN_G 1
 #define PIN_B 4
-
-ISR(WDT_vect) {}
 #elif TAMAGOTCHI
 uint8_t hunger;
 uint8_t fun;
@@ -53,17 +53,18 @@ static void save_tmg() {
 }
 #elif WEATHER_STATION
 #include <TinyBMP280.h>
-tbmp::TinyBMP280 bmp;
+tbmp::TinyBMP180 bmp;
 #endif
 
 #if (TAMAGOTCHI || WEATHER_STATION)
+#define SSD1306 0x3c
 #include <Tiny4kOLED.h>
 #endif
 
 void sleep(bool is_long, bool wait = true, uint8_t long_to = WDTO_2S) {
     cli();
     wdt_reset();
-    // MCUSR &= ~(1 << WDRF);
+    MCUSR &= ~(1 << WDRF);
     // WDTCR |= (1 << WDCE) | (1 << WDE);
     if(wait) {
         WDTCR = (1 << WDCE) | (1 << WDE);
@@ -71,7 +72,7 @@ void sleep(bool is_long, bool wait = true, uint8_t long_to = WDTO_2S) {
     }
     sei();
 
-    set_sleep_mode(SLEEP_MODE_IDLE);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
 
     sleep_cpu();
@@ -91,7 +92,7 @@ void setup() {
     oled.begin(128, 64, sizeof(tiny4koled_init_128x64br), tiny4koled_init_128x64br);
     oled.clear();
     oled.on();
-    oled.setFont(FONT8X16P);
+    oled.setFont(FONT8X16);
 #endif
 
 #if MOOD_INDICATOR
@@ -106,16 +107,24 @@ void setup() {
 
 #if TAMAGOTCHI
     load_tmg();
+    if(hunger > 120) {
+        hunger = 0;
+        fun = 0;
+        xp = 0;
+        lvl = 0;
+    }
     if(hunger != 0) hunger--;
+    save_tmg();
 
     oled.println(" \\O/");
-    oled.println( "'-O-'");
+    oled.println( " -O- ");
     oled.println( " /o\\");
+    oled.setFont(FONT6X8);
     oled.print("HUN=");
     oled.print(hunger);
     oled.print(" FUN=");
-    oled.print(fun);
-    oled.print(" XP=");
+    oled.println(fun);
+    oled.print("XP=");
     oled.print(xp);
     oled.print(" LVL=");
     oled.print(lvl);
@@ -131,12 +140,15 @@ void setup() {
             }
             if(hunger != 20) hunger++;
             save_tmg();
+            while(!digitalRead(PIN_FUN));
             wdt_enable(WDTO_15MS); // will this work? no idea tbh
             while(true);
         }
     }
+    oled.clear();
     oled.off();
 #elif WEATHER_STATION
+    bmp.begin();
     float t = bmp.readTemperature();
     oled.print(t);
     oled.println(" C");
@@ -154,6 +166,7 @@ void loop() {
     counter++;
 #elif WEATHER_STATION
     delay(10000);
+    oled.clear();
     oled.off();
     sleep(false, false);
 #endif
