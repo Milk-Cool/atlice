@@ -11,7 +11,7 @@ this is a hairclip that can be used as either a mood indicator, a tamagotchi, or
 
 ## how do i use this?
 first of all, get all the required components (listed in `bom.xml`, disregard components you don't need) and build it! the gerber files and the source project files are in this repo, too (see `kicad/`). here are some notes:
-- get an SSD1306 display that a. works via i2c and b. has the power pin on the left. from what i could find, these also take 3V as the input just fine, which is perfect for our purposes since we use a CR2302 battery.
+- get an SSD1306 display that a. works via i2c and b. has the power pin on the left. from what i could find, these also take 3V as the input just fine, which is perfect for our purposes since we use a CR2302 battery. (note: some sellers might send you the wrong type of display, like mine! please be aware of that)
 - solder a 150Ohm resistor at J5-J6 and a 100Ohm resistor at J7-J8 and J9-J10.
 - solder/attach the SSD1306 display facing inwards at J2, and the BMP180 temperature sensor also facing inwards at J3. the attiny85 goes at U1.
 - attach the battery case at J1, with the top pin being the ground pin and the bottom pin being the +3V0 pin.
@@ -33,3 +33,6 @@ then just turn on the battery and enjoy!!
 
 ## why was this made?
 i have an old mood indicator hairclip (inspired by a pi pico hot glued to a hairclip, which was gifted to me by a friend), which also has an attiny85. i built it around december of 2025, and wanted to push the concept of wearable hairclips even further ever since then. this is my next attempt, hopefully it's actually good!!
+
+## credits
+- zine background: https://www.dreamstime.com/illustration/bug-wallpaper.html
