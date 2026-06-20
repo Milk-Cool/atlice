@@ -1,7 +1,7 @@
 # atlice
 attiny85-based multi-purpose lice hairclips
 
-![drawing of the atlice](images/drawing.png)
+![photo of the atlice](images/photo.png)
 ![3d model](images/3d.png)
 
 <small>[head image source](https://en.wiktionary.org/wiki/head)</small>
